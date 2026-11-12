@@ -9,8 +9,9 @@ function authArgs() {
   return LT_USERNAME && LT_ACCESS_KEY ? ['--username', LT_USERNAME, '--access-key', LT_ACCESS_KEY] : [];
 }
 
-export function testmdArgs(flowPath, kane, { heal } = {}) {
+export function testmdArgs(flowPath, kane, { heal, author } = {}) {
   const args = ['testmd', 'run', flowPath, '--agent'];
+  if (author) args.push('--author'); // re-record every step (costs credits)
   if (kane.headless) args.push('--headless');
   if (!(heal ?? kane.adaptiveHeal)) args.push('--no-adaptive-heal');
   if (kane.timeoutS) args.push('--timeout', String(kane.timeoutS));

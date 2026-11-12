@@ -45,7 +45,7 @@ export function plan(cfg, { base = 'HEAD', all = false, flowPaths = null } = {})
   return p;
 }
 
-export async function verify(cfg, { base = 'HEAD', all = false, flowPaths = null, heal, log = () => {} } = {}) {
+export async function verify(cfg, { base = 'HEAD', all = false, flowPaths = null, heal, author = false, log = () => {} } = {}) {
   const p = plan(cfg, { base, all, flowPaths });
   const summary = {
     type: 'kane_loop_summary',
@@ -79,7 +79,7 @@ export async function verify(cfg, { base = 'HEAD', all = false, flowPaths = null
   try {
     for (const { flow, because } of p.selected) {
       log(`  ▶ ${flow.path}${!['requested', '--all', 'failed last run'].includes(because[0]) ? `  (changed: ${because.join(', ')})` : ''}`);
-      const raw = await runKane(cfg.kane.bin, testmdArgs(flow.path, cfg.kane, { heal }), { cwd: cfg.root, onEvent: progress(log) });
+      const raw = await runKane(cfg.kane.bin, testmdArgs(flow.path, cfg.kane, { heal, author }), { cwd: cfg.root, onEvent: progress(log) });
       const r = summarizeTestmd(raw.events, raw.stderr, raw.exitCode);
       const entry = {
         flow: flow.path,

@@ -49,7 +49,7 @@ export const TOOLS = [
 function describe({ summary }, cfg) {
   const lines = [`kane-loop: ${summary.status}` + (summary.credits != null ? ` (credits used: ${summary.credits})` : '')];
   for (const f of summary.flows || []) {
-    lines.push(`- ${f.flow}: ${f.status}${f.failed_step ? ` at step ${f.failed_step.index} "${f.failed_step.heading}"` : ''}${f.error ? ` (${f.error})` : ''}`);
+    lines.push(`- ${f.flow}: ${f.status}${f.failed_step ? ` at step ${f.failed_step.index} "${f.failed_step.heading}"` : ''}${f.error ? ` (${f.error})` : ''}${f.session_id ? ` [Kane session ${f.session_id}]` : ''}`);
   }
   for (const s of summary.skipped || []) lines.push(`- ${s.flow}: skipped (${s.reason})`);
   if (summary.status === 'nothing_to_verify') lines.push('No saved flow covers the changed files.');

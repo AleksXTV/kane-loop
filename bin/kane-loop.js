@@ -12,8 +12,10 @@ import { scrub } from '../src/scrub.js';
 const HELP = `kane-loop: replay the Kane flows your change can break, and hand failures to your coding agent.
 
 Usage:
-  kane-loop verify [--base <ref>] [--all] [--flow <path>]... [--heal]
+  kane-loop verify [--base <ref>] [--all] [--flow <path>]... [--heal] [--author]
                          replay affected _test.md flows headless (default: diff vs HEAD)
+                         --heal: let Kane re-author a step whose replay misses (credits)
+                         --author: re-record every step, e.g. on a new account (credits)
   kane-loop watch [--base <ref>]   re-verify on every save
   kane-loop rerun-failed           replay only the flows that failed last time
   kane-loop last-failure           print .kane/last-failure.md
@@ -32,7 +34,7 @@ function parse(argv) {
     const a = argv[i];
     if (a === '--base' || a === '--url') opts[a.slice(2)] = argv[++i];
     else if (a === '--flow') opts.flow.push(argv[++i]);
-    else if (a === '--all' || a === '--heal') opts[a.slice(2)] = true;
+    else if (a === '--all' || a === '--heal' || a === '--author') opts[a.slice(2)] = true;
     else if (a === '-h' || a === '--help') opts.help = true;
     else opts._.push(a);
   }
@@ -51,7 +53,7 @@ async function main() {
   switch (cmd) {
     case 'verify': {
       const flowPaths = [...opts.flow, ...opts._.filter((p) => p.endsWith('_test.md'))];
-      const { summary, exitCode } = await verify(cfg, { base: opts.base || 'HEAD', all: opts.all, flowPaths, heal: opts.heal || undefined, log });
+      const { summary, exitCode } = await verify(cfg, { base: opts.base || 'HEAD', all: opts.all, flowPaths, heal: opts.heal || undefined, author: opts.author, log });
       if (summary.status === 'nothing_to_verify') log('kane-loop: no saved flow covers the changed files; nothing to replay');
       if (summary.last_failure) log(`kane-loop: wrote ${summary.last_failure}`);
       emit(summary);
