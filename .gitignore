@@ -1,0 +1,9 @@
+node_modules/
+# kane-cli run artifacts: evidence packs carry the account identity, never commit them
+.testmuai/evidence/
+.testmuai/tests/
+# kane-loop runtime state (last-failure.md, last-run.json, screenshots)
+.kane/
+demo/raw/
+.env
+*.log

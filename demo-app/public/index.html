@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Splitly: split the bill</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Splitly</h1>
+      <p class="tagline">Split the bill with friends. No sign-up.</p>
+    </header>
+
+    <section aria-labelledby="people-h">
+      <h2 id="people-h">People</h2>
+      <form id="person-form" class="row">
+        <label for="person-name">Name</label>
+        <input id="person-name" name="name" placeholder="e.g. Ana" autocomplete="off">
+        <button type="submit">Add person</button>
+      </form>
+      <p id="people-count" class="muted">No people yet</p>
+      <ul id="people-list"></ul>
+    </section>
+
+    <section aria-labelledby="exp-h">
+      <h2 id="exp-h">Expenses</h2>
+      <form id="expense-form" class="row">
+        <label for="exp-what">What</label>
+        <input id="exp-what" name="what" placeholder="Dinner" autocomplete="off">
+        <label for="exp-amount">Amount</label>
+        <input id="exp-amount" name="amount" inputmode="decimal" placeholder="0.00" autocomplete="off">
+        <label for="exp-payer">Paid by</label>
+        <select id="exp-payer" name="payer"></select>
+        <button type="submit">Add expense</button>
+      </form>
+      <p id="expense-error" class="error" role="alert"></p>
+      <ul id="expense-list"></ul>
+      <div class="row">
+        <label for="tip">Tip %</label>
+        <input id="tip" name="tip" type="number" min="0" max="100" step="1" value="0">
+      </div>
+    </section>
+
+    <section aria-labelledby="sum-h" id="summary">
+      <h2 id="sum-h">Summary</h2>
+      <dl>
+        <dt>Subtotal</dt><dd id="subtotal">$0.00</dd>
+        <dt>Tip</dt><dd id="tip-amount">$0.00</dd>
+        <dt>Total</dt><dd id="total">$0.00</dd>
+        <dt>Each person's share</dt><dd id="share">$0.00</dd>
+      </dl>
+      <h3>Settle up</h3>
+      <ul id="settlements"><li class="muted">Nothing to settle</li></ul>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
