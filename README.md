@@ -10,14 +10,14 @@ calls `rerun_failed`, and the loop closes when Kane replays the flow green.
 It works from the terminal (`verify`, `watch`, a pre-commit hook, CI), and as an **MCP server**
 that Cursor, Claude Code, Codex or any other MCP host can call. No dependencies besides Node 18+ and kane-cli.
 
-> Demo video (2 min): `<VIDEO_URL>` (also in [`demo/kane-loop-demo.mp4`](demo/kane-loop-demo.mp4))
+> Demo video (2 min): `https://www.youtube.com/watch?v=rV0Egah2SlU` (also in [`demo/kane-loop-demo.mp4`](demo/kane-loop-demo.mp4))
 
 ![Kane's screenshot of the failing step: $39.00 instead of $33.00](docs/real-runs/failure-tip_split.png)
 
 ## Try it in 30 seconds
 
 ```bash
-git clone <REPO_URL> kane-loop && cd kane-loop
+git clone https://github.com/AleksXTV/kane-loop.git kane-loop && cd kane-loop
 npm run app                  # Splitly, the demo app: http://localhost:4173
 ```
 
