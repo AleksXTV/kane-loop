@@ -1,0 +1,158 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>kane-loop demo</title>
+<style>
+  html,body{margin:0;height:100%;background:#0d1117;color:#e6edf3;font-family:system-ui,sans-serif;overflow:hidden}
+  .scene{position:absolute;inset:0;display:none}
+  .card{display:flex;flex-direction:column;justify-content:center;padding:0 90px}
+  .card h1{font-size:54px;margin:0 0 10px;color:#7ee787}
+  .card h2{font-size:26px;font-weight:500;margin:0 0 26px;color:#c9d1d9}
+  .card li{font-size:22px;line-height:1.6;color:#c9d1d9}
+  .card .small{font-size:17px;color:#8b949e;margin-top:22px}
+  .arch{font:18px/1.45 'DejaVu Sans Mono',monospace;color:#c9d1d9;white-space:pre;background:#161b22;border-radius:12px;padding:22px 28px;margin-top:8px}
+  .arch b{color:#7ee787;font-weight:600} .arch i{color:#79c0ff;font-style:normal} .arch u{color:#ffa657;text-decoration:none}
+  #term{padding:18px 26px 120px;box-sizing:border-box}
+  #termhead{font:600 14px system-ui;color:#8b949e;margin-bottom:8px;display:flex;justify-content:space-between}
+  #screen{font:15px/1.38 'DejaVu Sans Mono',monospace;height:560px;overflow:hidden;background:#010409;border:1px solid #30363d;border-radius:10px;padding:12px 16px}
+  .l{white-space:pre-wrap;word-break:break-all;min-height:1.38em}
+  .prompt{color:#79c0ff;font-weight:bold} .ok{color:#7ee787} .bad{color:#ff7b72} .warn{color:#e3b341} .dim{color:#8b949e}
+  .add{color:#7ee787} .del{color:#ff7b72} .hunk{color:#d2a8ff} .json{color:#a5d6ff}
+  .hl{background:#3d1d1f;outline:1px solid #ff7b72}
+  #cap{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);max-width:84%;background:rgba(240,246,252,.96);color:#0d1117;padding:12px 20px;border-radius:12px;font:600 21px/1.35 system-ui;text-align:center;box-shadow:0 6px 24px #0008;display:none;z-index:5}
+  #badge{position:absolute;right:26px;top:16px;background:#1f6feb;color:#fff;font:600 13px system-ui;padding:5px 10px;border-radius:8px;display:none;z-index:6}
+  .shot{display:none;align-items:center;justify-content:flex-start;padding-top:40px;box-sizing:border-box;flex-direction:column}
+  .shot .frame{position:relative;width:860px}
+  .shot img{width:860px;border-radius:10px;border:1px solid #30363d;display:block}
+  .shot .box{position:absolute;border:4px solid #ff7b72;border-radius:8px;box-shadow:0 0 0 4000px rgba(0,0,0,.28)}
+  .shot .box.green{border-color:#7ee787}
+  .shot .lbl{font:600 16px system-ui;color:#8b949e;margin:0 0 8px;width:860px}
+</style></head>
+<body>
+<div id="badge"></div>
+<div id="cap"></div>
+
+<div class="scene card" id="title">
+  <h1>kane-loop</h1>
+  <h2>A verification loop between your coding agent and Kane CLI</h2>
+  <ul>
+    <li>git diff &rarr; the saved <code>_test.md</code> flows that cover it &rarr; headless Kane replay</li>
+    <li>failure &rarr; <code>.kane/last-failure.md</code>: step, expected vs seen, Kane triage, culprit diff, evidence</li>
+    <li>MCP tools so Cursor, Claude Code or Codex can verify, read, fix and re-run on their own</li>
+  </ul>
+  <div class="small">Everything in this video is a real run of kane-cli 0.10.3 against the Splitly demo app on localhost (terminal output captured, waits shortened).</div>
+</div>
+
+<div class="scene card" id="arch">
+  <h2>How it works</h2>
+  <div class="arch"><b>agent edits code</b> ──► <i>kane-loop verify</i> / <i>watch</i> / MCP <i>verify_changed</i>
+                     │  git diff ∩ <u>&lt;!-- kane-loop covers: … --&gt;</u> in each flow
+                     ▼
+     kane-cli testmd run flows/x_test.md <u>--agent --headless --no-adaptive-heal</u>
+                     │  recorded steps replay in real Chrome: 0 credits, ~7 s per flow
+                     ▼
+     NDJSON stream ──► one summary line + <b>.kane/last-failure.md</b>
+                     │  expected (recorded check) vs seen (replayed value),
+                     │  Kane's triage, the culprit diff, screenshot, evidence pack
+                     ▼
+     MCP <i>last_failure</i> ──► <b>agent fixes the app</b> ──► MCP <i>rerun_failed</i> ──► green</div>
+</div>
+
+<div class="scene" id="term">
+  <div id="termhead"><span id="termtitle">~/kane-loop</span><span>bash</span></div>
+  <div id="screen"></div>
+</div>
+
+<div class="scene shot" id="shotfail">
+  <div class="lbl">Kane's screenshot of the failing step, taken during the replay (from its evidence pack)</div>
+  <div class="frame"><img src="../docs/real-runs/failure-tip_split.png"><div class="box" style="left:30.8%;top:84.3%;width:14.5%;height:5.6%"></div></div>
+</div>
+
+<div class="scene shot" id="shotgreen">
+  <div class="lbl">Kane's screenshot of the same step after the fix (green replay evidence pack)</div>
+  <div class="frame"><img src="../docs/real-runs/green-tip_split.jpg"><div class="box green" style="left:30.8%;top:84.3%;width:14.5%;height:5.6%"></div></div>
+</div>
+
+<div class="scene card" id="end">
+  <h1>Closed loop, verified by Kane</h1>
+  <ul id="endlist"></ul>
+  <div class="small">MIT · zero dependencies · Node 18+ · <code>npm test</code> runs 16 tests, including the MCP loop end to end</div>
+</div>
+
+<script>
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const $ = (id) => document.getElementById(id);
+function show(id) { document.querySelectorAll('.scene').forEach((s) => (s.style.display = 'none')); const el = $(id); el.style.display = el.classList.contains('card') ? 'flex' : el.classList.contains('shot') ? 'flex' : 'block'; }
+function cap(t) { const c = $('cap'); c.textContent = t || ''; c.style.display = t ? 'block' : 'none'; }
+function badge(t) { const b = $('badge'); b.textContent = t || ''; b.style.display = t ? 'block' : 'none'; }
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+function cls(line, scene) {
+  if (/^(\+\+\+|---) /.test(line) || /^diff --git|^index /.test(line)) return 'dim';
+  if (/^@@/.test(line)) return 'hunk';
+  if (/^\+/.test(line)) return 'add';
+  if (/^-(?!-)/.test(line) && !/^- \S/.test(line)) return 'del';
+  if (/^\{"type"/.test(line)) return 'json';
+  if (/✗|❌|failed at|isError: true/.test(line)) return 'bad';
+  if (/Kane triage|^\*\*.*\*\*$|^## /.test(line)) return 'warn';
+  if (/✓|passed|isError: false|ℹ pass/.test(line)) return 'ok';
+  if (/^→|^←|^ℹ/.test(line)) return 'dim';
+  return '';
+}
+async function term(scene, opts = {}) {
+  show('term');
+  const screen = $('screen');
+  screen.innerHTML = '';
+  cap(scene.caption);
+  badge(scene.ms > 9000 ? `real run ${Math.round(scene.ms / 1000)} s · waits shortened` : '');
+  const add = (html, c) => { const d = document.createElement('div'); d.className = 'l ' + (c || ''); d.innerHTML = html; screen.appendChild(d); screen.scrollTop = screen.scrollHeight; return d; };
+  add(`<span class="prompt">$</span> `, '');
+  const p = screen.lastChild;
+  for (const ch of scene.cmd) { p.innerHTML += esc(ch); await sleep(22); }
+  await sleep(500);
+  let prev = 0;
+  const lines = [];
+  for (const [t, , text] of scene.lines) {
+    const gap = t - prev; prev = t;
+    await sleep(Math.max(opts.min ?? 25, Math.min(gap, opts.cap ?? 700)));
+    const shown = text.length > 330 ? text.slice(0, 330) + ' …' : text;
+    lines.push(add(esc(shown).replace(/❌/g, '<span class="bad">❌</span>'), cls(text, scene)));
+  }
+  for (const f of opts.focus || []) {
+    const idx = lines.findIndex((d) => new RegExp(f.re).test(d.textContent));
+    if (idx !== -1) {
+      const target = lines[idx];
+      screen.scrollTo({ top: Math.max(0, target.offsetTop - screen.offsetTop - (f.offset ?? 120)), behavior: 'smooth' });
+      (f.mark || []).forEach((re) => lines.filter((d) => new RegExp(re).test(d.textContent)).forEach((d) => d.classList.add('hl')));
+      if (f.caption) cap(f.caption);
+    }
+    await sleep(f.hold ?? 4000);
+  }
+  await sleep(opts.hold ?? 2500);
+}
+async function card(id, caption, ms) { show(id); badge(''); cap(caption); await sleep(ms); }
+
+async function main() {
+  const [p1, p2] = window.DATA;
+  const s = (arr, i) => arr[i];
+  await card('title', '', 7000);
+  await card('arch', '', 11000);
+  await term(s(p1, 0), { hold: 4500 });
+  await term(s(p1, 1), { hold: 3000 });
+  await term(s(p1, 2), { hold: 4000 });
+  await term(s(p1, 3), { cap: 900, hold: 1000, focus: [{ re: 'Kane triage', offset: 200, mark: ['Kane triage', 'tip_split_test.md: failed'], hold: 5000, caption: 'Kane catches it: the tip flow fails at step 2, the settle-up flow (no tip) still passes, the add-people flow is never run.' }] });
+  await card('shotfail', 'Each person\'s share: $39.00. The recorded check expected $33.00.', 6500);
+  await term(s(p1, 4), { min: 18, cap: 60, hold: 500, focus: [
+    { re: '^## Expected vs seen', offset: 60, mark: ['\\$39\\.00 \\|'], hold: 5500, caption: '.kane/last-failure.md: expected vs seen comes from Kane\'s recorded check joined with the replayed value, not from a guess.' },
+    { re: "^## Kane's triage", offset: 40, mark: [], hold: 5000, caption: 'Kane\'s own triage: application issue, severity major, with a root cause and a suggested fix.' },
+    { re: '^## Likely culprit', offset: 40, mark: ['^\\+  const base'], hold: 5500, caption: 'And the exact hunk of the diff that triggered the replay. The agent now has everything it needs.' },
+  ] });
+  await term(s(p2, 0), { hold: 5000 });
+  await term(s(p2, 1), { cap: 700, hold: 4000 });
+  await term(s(p2, 2), { cap: 700, hold: 4000 });
+  await card('shotgreen', 'Same replay after the fix: $33.00 each, Ben and Chen each pay Ana $33.00.', 5500);
+  const list = $('endlist');
+  for (const t of window.ENDLIST) { const li = document.createElement('li'); li.innerHTML = t; list.appendChild(li); }
+  await card('end', '', 10000);
+  window.done = true;
+}
+window.start = main;
+</script>
+</body></html>
