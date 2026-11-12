@@ -1,0 +1,20 @@
+# Replay the Kane flows a pull request can break. Example workflow (not run during the hackathon).
+name: kane-loop
+on: pull_request
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install -g @testmuai/kane-cli
+      - run: npm test
+      - name: kane-loop verify (diff vs the PR base)
+        env:
+          LT_USERNAME: ${{ secrets.LT_USERNAME }}
+          LT_ACCESS_KEY: ${{ secrets.LT_ACCESS_KEY }}
+        run: node bin/kane-loop.js verify --base origin/${{ github.base_ref }} | tee kane-loop.ndjson
+      - if: failure()
+        run: cat .kane/last-failure.md >> "$GITHUB_STEP_SUMMARY"

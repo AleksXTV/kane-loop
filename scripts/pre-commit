@@ -1,0 +1,11 @@
+#!/bin/sh
+# git pre-commit hook: block the commit if a Kane flow covering the change fails.
+#   ln -s ../../scripts/pre-commit .git/hooks/pre-commit
+node "$(git rev-parse --show-toplevel)/bin/kane-loop.js" verify > /dev/null
+status=$?
+if [ $status -eq 1 ]; then
+  echo "kane-loop: a Kane flow failed, see .kane/last-failure.md (commit blocked)" >&2
+  exit 1
+fi
+[ $status -eq 2 ] && echo "kane-loop: Kane did not run (sign-in, Chrome or app); commit allowed" >&2
+exit 0
