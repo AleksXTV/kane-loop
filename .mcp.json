@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "kane-loop": {
+      "command": "node",
+      "args": ["bin/kane-loop.js", "mcp"]
+    }
+  }
+}
