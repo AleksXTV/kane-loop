@@ -1,0 +1,264 @@
+[
+ {
+  "caption": "The agent fixes the app code, not the flow: the tip is divided by the number of people too.",
+  "cmd": "git --no-pager diff -U1 demo-app/public/split.js",
+  "code": 0,
+  "ms": 6,
+  "lines": [
+   [
+    5,
+    "out",
+    "diff --git a/demo-app/public/split.js b/demo-app/public/split.js"
+   ],
+   [
+    5,
+    "out",
+    "index 3a88f46..22649bd 100644"
+   ],
+   [
+    5,
+    "out",
+    "--- a/demo-app/public/split.js"
+   ],
+   [
+    5,
+    "out",
+    "+++ b/demo-app/public/split.js"
+   ],
+   [
+    5,
+    "out",
+    "@@ -27,4 +27,5 @@ export function splitBill(people, expenses, tipPercent = 0) {"
+   ],
+   [
+    5,
+    "out",
+    " "
+   ],
+   [
+    5,
+    "out",
+    "-  // Even shares; the first people absorb leftover cents so shares always add up to total."
+   ],
+   [
+    5,
+    "out",
+    "-  const base = Math.floor(total / n);"
+   ],
+   [
+    5,
+    "out",
+    "+  // Split the subtotal and the tip separately, so a later \"skip the tip\" option only"
+   ],
+   [
+    5,
+    "out",
+    "+  // has to touch the tip part. Leftover cents go to the first people, as before."
+   ],
+   [
+    5,
+    "out",
+    "+  const base = Math.floor(subtotal / n) + Math.floor(tip / n);"
+   ],
+   [
+    5,
+    "out",
+    "   let remainder = total - base * n;"
+   ]
+  ],
+  "at": "2026-11-12T02:06:45.459Z"
+ },
+ {
+  "caption": "rerun_failed over MCP: Kane replays only the flow that failed.",
+  "cmd": "node scripts/mcp-call.mjs rerun_failed",
+  "code": 0,
+  "ms": 15062,
+  "lines": [
+   [
+    77,
+    "err",
+    "→ tools/call rerun_failed {}"
+   ],
+   [
+    79,
+    "err",
+    "kane-loop: 1 flow(s) to replay"
+   ],
+   [
+    109,
+    "err",
+    "starting app: node demo-app/server.js"
+   ],
+   [
+    426,
+    "err",
+    "  ▶ flows/tip_split_test.md"
+   ],
+   [
+    5270,
+    "err",
+    "    step 1 \"Add a dinner paid by Ana\" ..."
+   ],
+   [
+    8159,
+    "err",
+    "    step 1 ✓ passed (2.87s)"
+   ],
+   [
+    8159,
+    "err",
+    "    step 2 \"Add a 10% tip\" ..."
+   ],
+   [
+    8644,
+    "err",
+    "    step 2 ✓ passed (0.48s)"
+   ],
+   [
+    8645,
+    "err",
+    "    step 3 \"Check the settle-up\" ..."
+   ],
+   [
+    8908,
+    "err",
+    "    step 3 ✓ passed (0.26s)"
+   ],
+   [
+    15055,
+    "err",
+    "  ✓ flows/tip_split_test.md: passed in 7s (replayed 3, authored 0, credits 0)"
+   ],
+   [
+    15057,
+    "out",
+    "kane-loop: passed (credits used: 0)"
+   ],
+   [
+    15057,
+    "out",
+    "- flows/tip_split_test.md: passed"
+   ],
+   [
+    15057,
+    "out",
+    "- flows/add_people_test.md: skipped (not requested)"
+   ],
+   [
+    15057,
+    "out",
+    "- flows/settle_up_test.md: skipped (not requested)"
+   ],
+   [
+    15057,
+    "err",
+    "← isError: false"
+   ]
+  ],
+  "at": "2026-11-12T02:06:45.466Z"
+ },
+ {
+  "caption": "Before committing, the agent verifies everything the diff touches.",
+  "cmd": "kane-loop verify",
+  "code": 0,
+  "ms": 33899,
+  "lines": [
+   [
+    57,
+    "err",
+    "kane-loop: 2 flow(s) to replay for 3 changed file(s)"
+   ],
+   [
+    85,
+    "err",
+    "starting app: node demo-app/server.js"
+   ],
+   [
+    400,
+    "err",
+    "  ▶ flows/settle_up_test.md  (changed: demo-app/public/split.js)"
+   ],
+   [
+    5141,
+    "err",
+    "    step 1 \"Add a dinner paid by Ana\" ..."
+   ],
+   [
+    8001,
+    "err",
+    "    step 1 ✓ passed (2.84s)"
+   ],
+   [
+    8001,
+    "err",
+    "    step 2 \"Add a taxi paid by Ben\" ..."
+   ],
+   [
+    10594,
+    "err",
+    "    step 2 ✓ passed (2.59s)"
+   ],
+   [
+    10594,
+    "err",
+    "    step 3 \"Check who pays whom\" ..."
+   ],
+   [
+    10760,
+    "err",
+    "    step 3 ✓ passed (0.16s)"
+   ],
+   [
+    18901,
+    "err",
+    "  ✓ flows/settle_up_test.md: passed in 9s (replayed 3, authored 0, credits 0)"
+   ],
+   [
+    18901,
+    "err",
+    "  ▶ flows/tip_split_test.md  (changed: demo-app/public/split.js)"
+   ],
+   [
+    23569,
+    "err",
+    "    step 1 \"Add a dinner paid by Ana\" ..."
+   ],
+   [
+    26501,
+    "err",
+    "    step 1 ✓ passed (2.91s)"
+   ],
+   [
+    26501,
+    "err",
+    "    step 2 \"Add a 10% tip\" ..."
+   ],
+   [
+    27006,
+    "err",
+    "    step 2 ✓ passed (0.5s)"
+   ],
+   [
+    27006,
+    "err",
+    "    step 3 \"Check the settle-up\" ..."
+   ],
+   [
+    27261,
+    "err",
+    "    step 3 ✓ passed (0.25s)"
+   ],
+   [
+    33887,
+    "err",
+    "  ✓ flows/tip_split_test.md: passed in 7s (replayed 3, authored 0, credits 0)"
+   ],
+   [
+    33888,
+    "out",
+    "{\"type\":\"kane_loop_summary\",\"status\":\"passed\",\"base\":\"HEAD\",\"changed\":[\"demo-app/public/split.js\",\"demo/captures/phase1.json\",\"src/report.js\"],\"flows\":[{\"flow\":\"flows/settle_up_test.md\",\"status\":\"passed\",\"exit\":0,\"because\":[\"demo-app/public/split.js\"],\"duration_s\":9,\"replayed\":3,\"authored\":0,\"credits\":0,\"session_id\":\"1ad0e261-8106-45cd-8cbd-4aa9191a2493\",\"evidence\":\".testmuai/evidence/2a7a554a-6a1b-4d0d-92b0-b4dc94c6ac89.evidence\"},{\"flow\":\"flows/tip_split_test.md\",\"status\":\"passed\",\"exit\":0,\"because\":[\"demo-app/public/split.js\"],\"duration_s\":7,\"replayed\":3,\"authored\":0,\"credits\":0,\"session_id\":\"143977c5-0f72-4d1e-94c1-a8784d5ec17b\",\"evidence\":\".testmuai/evidence/8bb947e0-0e56-45ca-be3e-1504d12c28f3.evidence\"}],\"skipped\":[{\"flow\":\"flows/add_people_test.md\",\"reason\":\"no changed file is covered by this flow\"}],\"credits\":0,\"last_failure\":null,\"ts\":\"2026-11-12T02:07:00.583Z\"}"
+   ]
+  ],
+  "at": "2026-11-12T02:07:00.528Z"
+ }
+]

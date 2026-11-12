@@ -1,0 +1,522 @@
+[
+ {
+  "caption": "A coding agent refactors the bill split: subtotal and tip are now split separately.",
+  "cmd": "git apply demo/regression.patch && git --no-pager diff --stat && git --no-pager diff -U1",
+  "code": 0,
+  "ms": 10,
+  "lines": [
+   [
+    8,
+    "out",
+    " demo-app/public/split.js | 5 +++--"
+   ],
+   [
+    8,
+    "out",
+    " 1 file changed, 3 insertions(+), 2 deletions(-)"
+   ],
+   [
+    9,
+    "out",
+    "diff --git a/demo-app/public/split.js b/demo-app/public/split.js"
+   ],
+   [
+    9,
+    "out",
+    "index 3a88f46..24a0a9b 100644"
+   ],
+   [
+    9,
+    "out",
+    "--- a/demo-app/public/split.js"
+   ],
+   [
+    9,
+    "out",
+    "+++ b/demo-app/public/split.js"
+   ],
+   [
+    9,
+    "out",
+    "@@ -27,4 +27,5 @@ export function splitBill(people, expenses, tipPercent = 0) {"
+   ],
+   [
+    9,
+    "out",
+    " "
+   ],
+   [
+    9,
+    "out",
+    "-  // Even shares; the first people absorb leftover cents so shares always add up to total."
+   ],
+   [
+    9,
+    "out",
+    "-  const base = Math.floor(total / n);"
+   ],
+   [
+    9,
+    "out",
+    "+  // Split the subtotal and the tip separately, so a later \"skip the tip\" option only"
+   ],
+   [
+    9,
+    "out",
+    "+  // has to touch the tip part. Leftover cents go to the first people, as before."
+   ],
+   [
+    9,
+    "out",
+    "+  const base = Math.floor(subtotal / n) + tip;"
+   ],
+   [
+    9,
+    "out",
+    "   let remainder = total - base * n;"
+   ]
+  ],
+  "at": "2026-11-12T02:05:32.003Z"
+ },
+ {
+  "caption": "The unit tests still pass: they never exercised the tip path.",
+  "cmd": "npm test --silent 2>&1 | tail -9",
+  "code": 0,
+  "ms": 593,
+  "lines": [
+   [
+    592,
+    "out",
+    "✔ credentials never leak into args shown or text written (0.358326ms)"
+   ],
+   [
+    592,
+    "out",
+    "ℹ tests 14"
+   ],
+   [
+    592,
+    "out",
+    "ℹ suites 0"
+   ],
+   [
+    592,
+    "out",
+    "ℹ pass 14"
+   ],
+   [
+    592,
+    "out",
+    "ℹ fail 0"
+   ],
+   [
+    592,
+    "out",
+    "ℹ cancelled 0"
+   ],
+   [
+    592,
+    "out",
+    "ℹ skipped 0"
+   ],
+   [
+    592,
+    "out",
+    "ℹ todo 0"
+   ],
+   [
+    592,
+    "out",
+    "ℹ duration_ms 459.228846"
+   ]
+  ],
+  "at": "2026-11-12T02:05:32.013Z"
+ },
+ {
+  "caption": "kane-loop maps the git diff to the Kane flows that cover the changed file.",
+  "cmd": "kane-loop flows",
+  "code": 0,
+  "ms": 54,
+  "lines": [
+   [
+    51,
+    "err",
+    "changed: demo-app/public/split.js"
+   ],
+   [
+    51,
+    "err",
+    "  REPLAY flows/settle_up_test.md  <- demo-app/public/split.js"
+   ],
+   [
+    51,
+    "err",
+    "  REPLAY flows/tip_split_test.md  <- demo-app/public/split.js"
+   ],
+   [
+    51,
+    "err",
+    "  skip   flows/add_people_test.md  (no changed file is covered by this flow)"
+   ],
+   [
+    51,
+    "out",
+    "{\"type\":\"kane_loop_plan\",\"changed\":[\"demo-app/public/split.js\"],\"selected\":[\"flows/settle_up_test.md\",\"flows/tip_split_test.md\"],\"skipped\":[\"flows/add_people_test.md\"]}"
+   ]
+  ],
+  "at": "2026-11-12T02:05:32.607Z"
+ },
+ {
+  "caption": "kane-loop verify: Kane CLI replays those flows headless in real Chrome.",
+  "cmd": "kane-loop verify",
+  "code": 1,
+  "ms": 59344,
+  "lines": [
+   [
+    53,
+    "err",
+    "kane-loop: 2 flow(s) to replay for 1 changed file(s)"
+   ],
+   [
+    81,
+    "err",
+    "starting app: node demo-app/server.js"
+   ],
+   [
+    399,
+    "err",
+    "  ▶ flows/settle_up_test.md  (changed: demo-app/public/split.js)"
+   ],
+   [
+    5711,
+    "err",
+    "    step 1 \"Add a dinner paid by Ana\" ..."
+   ],
+   [
+    8604,
+    "err",
+    "    step 1 ✓ passed (2.87s)"
+   ],
+   [
+    8604,
+    "err",
+    "    step 2 \"Add a taxi paid by Ben\" ..."
+   ],
+   [
+    11297,
+    "err",
+    "    step 2 ✓ passed (2.69s)"
+   ],
+   [
+    11297,
+    "err",
+    "    step 3 \"Check who pays whom\" ..."
+   ],
+   [
+    11465,
+    "err",
+    "    step 3 ✓ passed (0.16s)"
+   ],
+   [
+    18613,
+    "err",
+    "  ✓ flows/settle_up_test.md: passed in 10s (replayed 3, authored 0, credits 0)"
+   ],
+   [
+    18613,
+    "err",
+    "  ▶ flows/tip_split_test.md  (changed: demo-app/public/split.js)"
+   ],
+   [
+    23090,
+    "err",
+    "    step 1 \"Add a dinner paid by Ana\" ..."
+   ],
+   [
+    25938,
+    "err",
+    "    step 1 ✓ passed (2.83s)"
+   ],
+   [
+    25938,
+    "err",
+    "    step 2 \"Add a 10% tip\" ..."
+   ],
+   [
+    52014,
+    "err",
+    "    Kane triage: Per-person share is not divided among all people (application_issue, major)"
+   ],
+   [
+    52014,
+    "err",
+    "    step 2 ✗ failed (26.07s)"
+   ],
+   [
+    59335,
+    "err",
+    "  ✗ flows/tip_split_test.md: failed in 32s (replayed 3, authored 0, credits 0.72)"
+   ],
+   [
+    59335,
+    "err",
+    "kane-loop: wrote .kane/last-failure.md"
+   ],
+   [
+    59336,
+    "out",
+    "{\"type\":\"kane_loop_summary\",\"status\":\"failed\",\"base\":\"HEAD\",\"changed\":[\"demo-app/public/split.js\"],\"flows\":[{\"flow\":\"flows/settle_up_test.md\",\"status\":\"passed\",\"exit\":0,\"because\":[\"demo-app/public/split.js\"],\"duration_s\":10,\"replayed\":3,\"authored\":0,\"credits\":0,\"session_id\":\"13f2f862-dd2d-4827-bceb-73a998340270\",\"evidence\":\".testmuai/evidence/6c5d3953-151c-450a-bafb-4f653f67b21a.evidence\"},{\"flow\":\"flows/tip_split_test.md\",\"status\":\"failed\",\"exit\":1,\"because\":[\"demo-app/public/split.js\"],\"duration_s\":32,\"replayed\":3,\"authored\":0,\"credits\":0.72,\"session_id\":\"d6599835-1adb-409c-bcbb-40c607da5367\",\"evidence\":\".testmuai/evidence/f9f3b506-2f2d-4f4e-b2ac-1c4bf514608f.evidence\",\"failed_step\":{\"index\":2,\"heading\":\"Add a 10% tip\",\"reason\":\"assertion_failed: @ step 4\"},\"expected_vs_seen\":[{\"check\":\"Each person's share shows \\\"$33.00\\\".\",\"expected\":\"$33.00\",\"seen\":\"$39.00\"}],\"kane_triage\":\"With three people, a $99.00 total is shown correctly but the displayed share is $39.00 instead of $33.00.\"}],\"skipped\":[{\"flow\":\"flows/add_people_test.md\",\"reason\":\"no changed file is covered by this flow\"}],\"credits\":0.72,\"last_failure\":\".kane/last-failure.md\",\"ts\":\"2026-11-12T02:05:32.713Z\"}"
+   ]
+  ],
+  "at": "2026-11-12T02:05:32.661Z"
+ },
+ {
+  "caption": "The agent reads the hand-off through MCP (tool: last_failure).",
+  "cmd": "node scripts/mcp-call.mjs last_failure",
+  "code": 0,
+  "ms": 78,
+  "lines": [
+   [
+    75,
+    "err",
+    "→ tools/call last_failure {}"
+   ],
+   [
+    75,
+    "out",
+    "# Kane caught a failure in `flows/tip_split_test.md`"
+   ],
+   [
+    75,
+    "out",
+    "- **Failing step:** 2 of 3: \"Add a 10% tip\""
+   ],
+   [
+    75,
+    "out",
+    "- **Kane reason:** `assertion_failed: @ step 4` (failed action: assert: assert: Total shows \"$99.00\" and Each person's share shows \"$33.00\".)"
+   ],
+   [
+    75,
+    "out",
+    "- **Page:** http://localhost:4173/?people=Ana,Ben,Chen"
+   ],
+   [
+    75,
+    "out",
+    "- **Run:** session `d6599835-1adb-409c-bcbb-40c607da5367`, 32s, 3 steps replayed / 0 authored, credits 0.72"
+   ],
+   [
+    75,
+    "out",
+    "## What the step asks"
+   ],
+   [
+    75,
+    "out",
+    "```text"
+   ],
+   [
+    75,
+    "out",
+    "Set the Tip % field to 10."
+   ],
+   [
+    75,
+    "out",
+    "Verify Total shows \"$99.00\" and Each person's share shows \"$33.00\"."
+   ],
+   [
+    75,
+    "out",
+    "```"
+   ],
+   [
+    75,
+    "out",
+    "## Expected vs seen"
+   ],
+   [
+    75,
+    "out",
+    "| Check | Expected | Seen on the page | |"
+   ],
+   [
+    75,
+    "out",
+    "|---|---|---|---|"
+   ],
+   [
+    75,
+    "out",
+    "| Total shows \"$99.00\". | $99.00 | $99.00 | ✓ |"
+   ],
+   [
+    75,
+    "out",
+    "| Each person's share shows \"$33.00\". | $33.00 | $39.00 | ❌ |"
+   ],
+   [
+    75,
+    "out",
+    "## Kane's triage (application_issue/ui_data_defect, severity major, confidence 0.99)"
+   ],
+   [
+    75,
+    "out",
+    "**Per-person share is not divided among all people**"
+   ],
+   [
+    75,
+    "out",
+    "With three people, a $99.00 total is shown correctly but the displayed share is $39.00 instead of $33.00."
+   ],
+   [
+    75,
+    "out",
+    "- Root cause: The summary is using the wrong amount when calculating each person's share, even though the tip and total are correct."
+   ],
+   [
+    75,
+    "out",
+    "- Suggested fix: Check the per-person calculation for a three-person split. A $90.00 subtotal plus a 10% tip makes $99.00, which should show as $33.00 each."
+   ],
+   [
+    75,
+    "out",
+    "- Signal: \"Total shows \"$99.00\" and Each person's share shows \"$33.00\".\""
+   ],
+   [
+    76,
+    "out",
+    "## Likely culprit: the change that triggered this replay"
+   ],
+   [
+    76,
+    "out",
+    "Changed files covered by this flow: `demo-app/public/split.js`"
+   ],
+   [
+    76,
+    "out",
+    "```diff"
+   ],
+   [
+    76,
+    "out",
+    "diff --git a/demo-app/public/split.js b/demo-app/public/split.js"
+   ],
+   [
+    76,
+    "out",
+    "index 3a88f46..24a0a9b 100644"
+   ],
+   [
+    76,
+    "out",
+    "--- a/demo-app/public/split.js"
+   ],
+   [
+    76,
+    "out",
+    "+++ b/demo-app/public/split.js"
+   ],
+   [
+    76,
+    "out",
+    "@@ -26,6 +26,7 @@ export function splitBill(people, expenses, tipPercent = 0) {"
+   ],
+   [
+    76,
+    "out",
+    "   if (n === 0) return { subtotal, tip, total, perPerson: 0, shares: {}, balances: {}, settlements: [] };"
+   ],
+   [
+    76,
+    "out",
+    " "
+   ],
+   [
+    76,
+    "out",
+    "-  // Even shares; the first people absorb leftover cents so shares always add up to total."
+   ],
+   [
+    76,
+    "out",
+    "-  const base = Math.floor(total / n);"
+   ],
+   [
+    76,
+    "out",
+    "+  // Split the subtotal and the tip separately, so a later \"skip the tip\" option only"
+   ],
+   [
+    76,
+    "out",
+    "+  // has to touch the tip part. Leftover cents go to the first people, as before."
+   ],
+   [
+    76,
+    "out",
+    "+  const base = Math.floor(subtotal / n) + tip;"
+   ],
+   [
+    76,
+    "out",
+    "   let remainder = total - base * n;"
+   ],
+   [
+    76,
+    "out",
+    "   const shares = {};"
+   ],
+   [
+    76,
+    "out",
+    "```"
+   ],
+   [
+    76,
+    "out",
+    "## Evidence"
+   ],
+   [
+    76,
+    "out",
+    "- Screenshot at the failing step: `.kane/failure-tip_split.png`"
+   ],
+   [
+    76,
+    "out",
+    "- Evidence pack (screenshots, console, network, failure record): `.testmuai/evidence/f9f3b506-2f2d-4f4e-b2ac-1c4bf514608f.evidence`  "
+   ],
+   [
+    76,
+    "out",
+    "  open it with `kane-cli evidence serve .testmuai/evidence/f9f3b506-2f2d-4f4e-b2ac-1c4bf514608f.evidence`"
+   ],
+   [
+    76,
+    "out",
+    "## Next"
+   ],
+   [
+    76,
+    "out",
+    "1. Fix the application code (the recorded flow describes the intended behaviour; do not edit the `_test.md` to make it pass unless the requirement really changed)."
+   ],
+   [
+    76,
+    "out",
+    "2. Re-run: `kane-loop rerun-failed` (MCP: `rerun_failed`). Replays of unchanged steps cost 0 credits."
+   ],
+   [
+    76,
+    "err",
+    "← isError: false"
+   ]
+  ],
+  "at": "2026-11-12T02:06:32.005Z"
+ }
+]
