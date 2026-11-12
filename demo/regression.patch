@@ -1,15 +1,12 @@
 diff --git a/demo-app/public/split.js b/demo-app/public/split.js
-index 3a88f46..24a0a9b 100644
+index 22649bd..24a0a9b 100644
 --- a/demo-app/public/split.js
 +++ b/demo-app/public/split.js
-@@ -25,8 +25,9 @@ export function splitBill(people, expenses, tipPercent = 0) {
-   const total = subtotal + tip;
-   if (n === 0) return { subtotal, tip, total, perPerson: 0, shares: {}, balances: {}, settlements: [] };
+@@ -27,7 +27,7 @@ export function splitBill(people, expenses, tipPercent = 0) {
  
--  // Even shares; the first people absorb leftover cents so shares always add up to total.
--  const base = Math.floor(total / n);
-+  // Split the subtotal and the tip separately, so a later "skip the tip" option only
-+  // has to touch the tip part. Leftover cents go to the first people, as before.
+   // Split the subtotal and the tip separately, so a later "skip the tip" option only
+   // has to touch the tip part. Leftover cents go to the first people, as before.
+-  const base = Math.floor(subtotal / n) + Math.floor(tip / n);
 +  const base = Math.floor(subtotal / n) + tip;
    let remainder = total - base * n;
    const shares = {};
