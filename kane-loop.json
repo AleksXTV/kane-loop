@@ -1,0 +1,15 @@
+{
+  "flowsDir": "flows",
+  "app": {
+    "url": "http://localhost:4173/",
+    "command": "node demo-app/server.js",
+    "readyTimeoutMs": 15000
+  },
+  "kane": {
+    "bin": "kane-cli",
+    "headless": true,
+    "adaptiveHeal": false,
+    "timeoutS": 300
+  },
+  "ignore": ["README.md", "docs/**", "demo/**", "test/**", "*.md"]
+}
