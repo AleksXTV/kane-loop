@@ -96,4 +96,6 @@ async function main() {
   }
 }
 
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => process.exit(130));
+
 main().then((code) => process.exit(code), (err) => { log(`kane-loop: ${err.stack || err.message}`); process.exit(2); });

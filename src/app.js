@@ -20,12 +20,11 @@ export async function ensureApp(app, { cwd, log = () => {} } = {}) {
   const deadline = Date.now() + (app.readyTimeoutMs || 15000);
   while (Date.now() < deadline) {
     if (await up(app.url)) {
-      return {
-        started: true,
-        stop() {
-          try { process.platform === 'win32' ? child.kill() : process.kill(-child.pid); } catch { /* already gone */ }
-        },
+      const stop = () => {
+        try { process.platform === 'win32' ? child.kill() : process.kill(-child.pid); } catch { /* already gone */ }
       };
+      process.once('exit', stop); // never leave the app running behind us
+      return { started: true, stop };
     }
     await new Promise((r) => setTimeout(r, 300));
   }
