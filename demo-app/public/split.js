@@ -25,8 +25,9 @@ export function splitBill(people, expenses, tipPercent = 0) {
   const total = subtotal + tip;
   if (n === 0) return { subtotal, tip, total, perPerson: 0, shares: {}, balances: {}, settlements: [] };
 
-  // Even shares; the first people absorb leftover cents so shares always add up to total.
-  const base = Math.floor(total / n);
+  // Split the subtotal and the tip separately, so a later "skip the tip" option only
+  // has to touch the tip part. Leftover cents go to the first people, as before.
+  const base = Math.floor(subtotal / n) + Math.floor(tip / n);
   let remainder = total - base * n;
   const shares = {};
   for (const p of people) {
