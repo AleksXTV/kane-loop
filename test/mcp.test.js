@@ -107,3 +107,21 @@ test('CLI verify prints exactly one NDJSON summary on stdout', () => {
   assert.deepEqual(s.flows[0].expected_vs_seen, [{ check: "Each person's share shows \"$33.00\".", expected: '$33.00', seen: '$39.00' }]);
   assert.equal(s.last_failure, '.kane/last-failure.md');
 });
+
+test('a failed flow stays selected until it replays green, even after the diff is reverted', () => {
+  const dir = scratchRepo();
+  const run = (fixture) => {
+    try {
+      return JSON.parse(execFileSync(process.execPath, [bin, 'verify'], { cwd: dir, env: { ...process.env, FAKE_KANE_FIXTURE: join(here, 'fixtures', fixture) }, stdio: ['ignore', 'pipe', 'ignore'] }).toString());
+    } catch (err) {
+      return JSON.parse(err.stdout.toString());
+    }
+  };
+  writeFileSync(join(dir, 'app', 'split.js'), 'export const share = (t, n) => t / n + 6;\n');
+  assert.equal(run('tip_split_fail.ndjson').status, 'failed');
+  execFileSync('git', ['checkout', 'app/split.js'], { cwd: dir });
+  const s = run('tip_split_pass.ndjson');
+  assert.equal(s.status, 'passed');
+  assert.deepEqual(s.flows.map((f) => [f.flow, f.because]), [['flows/tip_split_test.md', ['failed last run']]]);
+  assert.equal(run('tip_split_pass.ndjson').status, 'nothing_to_verify');
+});

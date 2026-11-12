@@ -7,7 +7,7 @@ import { changedFiles, selectFlows, diffFor } from './diffmap.js';
 import { ensureApp } from './app.js';
 import { runKane, testmdArgs, objectiveArgs, summarizeTestmd, summarizeRun } from './kane.js';
 import { recordedChecks, compareChecks } from './expect.js';
-import { renderFailure, keepScreenshot, writeState, stateDir } from './report.js';
+import { renderFailure, keepScreenshot, writeState, stateDir, readFailedFlows } from './report.js';
 import { scrub } from './scrub.js';
 import { writeFileSync } from 'node:fs';
 
@@ -36,7 +36,13 @@ export function plan(cfg, { base = 'HEAD', all = false, flowPaths = null } = {})
     return { changed: [], selected, skipped: flows.filter((f) => !wanted.includes(f.path)).map((flow) => ({ flow, reason: 'not requested' })) };
   }
   if (all) return { changed: [], selected: flows.map((flow) => ({ flow, because: ['--all'] })), skipped: [] };
-  return selectFlows(flows, changedFiles(cfg.root, base), cfg.ignore);
+  const p = selectFlows(flows, changedFiles(cfg.root, base), cfg.ignore);
+  // A failure stays open until Kane replays that flow green, even if the diff no longer touches it.
+  for (const path of readFailedFlows(cfg)) {
+    const i = p.skipped.findIndex((s) => s.flow.path === path);
+    if (i !== -1) p.selected.push({ flow: p.skipped.splice(i, 1)[0].flow, because: ['failed last run'] });
+  }
+  return p;
 }
 
 export async function verify(cfg, { base = 'HEAD', all = false, flowPaths = null, heal, log = () => {} } = {}) {
@@ -72,7 +78,7 @@ export async function verify(cfg, { base = 'HEAD', all = false, flowPaths = null
   const failures = [];
   try {
     for (const { flow, because } of p.selected) {
-      log(`  ▶ ${flow.path}${because[0] !== 'requested' && because[0] !== '--all' ? `  (changed: ${because.join(', ')})` : ''}`);
+      log(`  ▶ ${flow.path}${!['requested', '--all', 'failed last run'].includes(because[0]) ? `  (changed: ${because.join(', ')})` : ''}`);
       const raw = await runKane(cfg.kane.bin, testmdArgs(flow.path, cfg.kane, { heal }), { cwd: cfg.root, onEvent: progress(log) });
       const r = summarizeTestmd(raw.events, raw.stderr, raw.exitCode);
       const entry = {
@@ -93,7 +99,7 @@ export async function verify(cfg, { base = 'HEAD', all = false, flowPaths = null
       if (r.status === 'not_started') entry.error = r.errors[0] || r.stderrTail || 'kane-cli did not start (exit 2)';
       if (r.failure) {
         const checks = compareChecks(recordedChecks(cfg.root, flow.outputDir, r.failure.stepIndex), r.failure.seen);
-        const culprit = because.filter((b) => b !== flow.path && b !== 'requested' && b !== '--all');
+        const culprit = because.filter((b) => b !== flow.path && !['requested', '--all', 'failed last run'].includes(b));
         const shot = keepScreenshot(cfg, flow, r.failure.screenshot);
         entry.failed_step = { index: r.failure.stepIndex, heading: r.failure.heading, reason: r.failure.reason };
         entry.expected_vs_seen = checks.filter((c) => c.ok === false).map(({ check, expected, seen }) => ({ check, expected, seen }));
