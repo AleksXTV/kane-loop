@@ -55,6 +55,48 @@
       "status": "passed",
       "valid": true,
       "at": "2026-11-12T02:07:29.099Z"
+    },
+    {
+      "execution_id": "a4705387-cd2b-4c93-9926-95c4f54f2e9e",
+      "run_kind": "replay",
+      "status": "broken",
+      "valid": true,
+      "at": "2026-11-12T02:09:04.329Z"
+    },
+    {
+      "execution_id": "164321c2-dbbb-4ee0-b384-6469eccd3158",
+      "run_kind": "replay",
+      "status": "broken",
+      "valid": true,
+      "at": "2026-11-12T02:10:34.157Z"
+    },
+    {
+      "execution_id": "885f98f8-b202-4692-8092-ad03b02f9748",
+      "run_kind": "replay",
+      "status": "broken",
+      "valid": true,
+      "at": "2026-11-12T02:11:57.074Z"
+    },
+    {
+      "execution_id": "210628a5-0230-4e3b-b8ba-e6e28b820252",
+      "run_kind": "replay",
+      "status": "passed",
+      "valid": true,
+      "at": "2026-11-12T02:12:31.175Z"
+    },
+    {
+      "execution_id": "999e16e5-ebd7-4c11-81e4-590ad225b3d9",
+      "run_kind": "replay",
+      "status": "broken",
+      "valid": true,
+      "at": "2026-11-12T02:13:51.914Z"
+    },
+    {
+      "execution_id": "29517e11-14a2-4040-bdf3-10885b8aac8d",
+      "run_kind": "replay",
+      "status": "passed",
+      "valid": true,
+      "at": "2026-11-12T02:14:11.644Z"
     }
   ]
 }

@@ -1,0 +1,10 @@
+Kane: passed in 35.3s, credits 18.25
+Added a $50 expense named “Hotel” paid by Ben.
+The settlement list updated to show that Ana pays Ben $25.00.
+reason: Objective completed
+Test Manager: <Test Manager share link (private, not published)>
+evidence: /home/box/.testmuai/kaneai/sessions/5b5aa155-b663-4740-ae14-37cab4e21c35/evidence/f8662288-4a04-48a2-987c-e63f6e45ea47.evidence
+→ tools/call verify_flow {"objective":"Go to http://localhost:4173/?people=Ana,Ben , add an expense \"Hotel\" of 50 paid by Ben, then verify the Settle up list shows \"Ana pays Ben $25.00\""}
+starting app: node demo-app/server.js
+  ▶ kane-cli run "Go to http://localhost:4173/?people=Ana,Ben , add an expense "Hotel" of 50 paid …"
+← isError: false
