@@ -1,8 +1,8 @@
 // The loop: changed files -> affected flows -> headless Kane replay -> report.
 
-import { join } from 'node:path';
+import { join, basename } from 'node:path';
 import { loadFlows, parseFlow } from './flows.js';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { changedFiles, selectFlows, diffFor } from './diffmap.js';
 import { ensureApp } from './app.js';
 import { runKane, testmdArgs, objectiveArgs, summarizeTestmd, summarizeRun } from './kane.js';
@@ -10,6 +10,13 @@ import { recordedChecks, compareChecks } from './expect.js';
 import { renderFailure, keepScreenshot, writeState, stateDir } from './report.js';
 import { scrub } from './scrub.js';
 import { writeFileSync } from 'node:fs';
+
+// testmd runs copy the sealed pack into <repo>/.testmuai/evidence/; prefer that stable, relative path.
+function projectEvidence(cfg, pack) {
+  if (!pack) return null;
+  const local = join('.testmuai', 'evidence', basename(pack));
+  return existsSync(join(cfg.root, local)) ? local : pack;
+}
 
 const icon = { passed: '✓', failed: '✗', skipped: '–' };
 
@@ -78,8 +85,10 @@ export async function verify(cfg, { base = 'HEAD', all = false, flowPaths = null
         authored: r.authored,
         credits: r.credits,
         session_id: r.sessionId,
-        evidence: r.evidence,
+        evidence: projectEvidence(cfg, r.evidence),
       };
+      if (r.shareUrl) entry.test_manager = r.shareUrl;
+      r.evidence = entry.evidence;
       summary.credits += r.credits;
       if (r.status === 'not_started') entry.error = r.errors[0] || r.stderrTail || 'kane-cli did not start (exit 2)';
       if (r.failure) {
