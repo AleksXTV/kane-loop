@@ -14,7 +14,7 @@ export function renderFailure({ flow, result, checks = [], because = [], diff = 
   const out = [];
   out.push(`# Kane caught a failure in \`${flow.path}\``, '');
   out.push(`- **Failing step:** ${f.stepIndex ?? '?'} of ${flow.steps.length}: "${f.heading ?? 'unknown'}"`);
-  if (f.reason) out.push(`- **Kane reason:** \`${f.reason}\`${f.failedAction ? ` (failed action: ${f.failedAction.kind}: ${f.failedAction.summary})` : ''}`);
+  if (f.reason) out.push(`- **Kane reason:** \`${f.reason}\`${f.failedAction ? ` (failed action: ${f.failedAction.summary})` : ''}`);
   if (f.finalUrl) out.push(`- **Page:** ${f.finalUrl}`);
   out.push(`- **Run:** session \`${result.sessionId ?? 'n/a'}\`, ${result.durationS ?? '?'}s, ${result.replayed ?? 0} steps replayed / ${result.authored ?? 0} authored, credits ${result.credits}`);
   out.push('');
