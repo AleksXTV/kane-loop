@@ -10,7 +10,7 @@
     "verify:all": "node bin/kane-loop.js verify --all",
     "watch": "node bin/kane-loop.js watch",
     "mcp": "node bin/kane-loop.js mcp",
-    "test": "node --test test/"
+    "test": "node --test test/*.test.js"
   },
   "engines": { "node": ">=18.17" },
   "keywords": ["kane-cli", "testmu", "e2e", "mcp", "agents", "testing"],
