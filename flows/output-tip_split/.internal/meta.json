@@ -97,6 +97,20 @@
       "status": "passed",
       "valid": true,
       "at": "2026-11-12T02:14:11.644Z"
+    },
+    {
+      "execution_id": "6558827f-bb06-4cbd-85fe-4646b6af3591",
+      "run_kind": "replay",
+      "status": "broken",
+      "valid": true,
+      "at": "2026-11-12T02:26:24.368Z"
+    },
+    {
+      "execution_id": "0ea73c65-1303-4d13-9be4-25ef470132fb",
+      "run_kind": "replay",
+      "status": "passed",
+      "valid": true,
+      "at": "2026-11-12T02:26:39.111Z"
     }
   ]
 }
